@@ -69,13 +69,13 @@ const CONFIG = {
   //  5. CẤU HÌNH GOOGLE DRIVE (LẤY DỮ LIỆU DỰ ÁN)
   // ─────────────────────────────────────────────
   GOOGLE_DRIVE: {
-    apiKey: '',                                    // API Key từ Google Cloud Console
-    rootFolderId: '',                              // ID folder gốc trên Drive
+    apiKey: 'AIzaSyBZuUYnI3QCYT1HgbffZSX39Pgop4HdFiU',                                    // API Key từ Google Cloud Console
+    rootFolderId: '1Aj1nGzsz8dmDbUXjHD8Fqw0fwdhw7Jar',                              // ID folder gốc trên Drive
   },
 
   // Bật = true: dùng dữ liệu mẫu (demo)
   // Tắt = false: lấy dữ liệu từ Google Drive
-  DEMO_MODE: true,
+  DEMO_MODE: false,
 
   // ─────────────────────────────────────────────
   //  6. CẤU HÌNH KỸ THUẬT (không cần thay đổi)
