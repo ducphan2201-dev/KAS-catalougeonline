@@ -165,7 +165,7 @@ const Catalogue = (() => {
       page.className = 'page';
       
       if (pageData.type === 'cover') {
-        page.innerHTML = `<img src="${pageData.image}" alt="Cover" style="width:100%;height:100%;object-fit:cover;">`;
+        page.innerHTML = `<img src="${pageData.image}" alt="Cover" style="width:100%;height:100%;object-fit:cover;object-position:bottom;">`;
       } 
       else if (pageData.type === 'info') {
         page.className = 'page page-info';
@@ -200,15 +200,15 @@ const Catalogue = (() => {
         page.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;"><h3 style="color:var(--gold);font-family:var(--font-display);font-style:italic;opacity:0.3;">KAS HOUZING</h3></div>';
       }
       else if (pageData.type === 'portrait') {
-        page.innerHTML = `<img src="${pageData.image}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">`;
+        page.innerHTML = `<img src="${pageData.image}" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:bottom;">`;
       }
       else if (pageData.type === 'spread-left') {
         page.style.overflow = 'hidden';
-        page.innerHTML = `<img src="${pageData.image}" loading="lazy" style="width:200%; max-width:200%; height:100%; object-fit:cover; object-position: left center; pointer-events:none;">`;
+        page.innerHTML = `<img src="${pageData.image}" loading="lazy" style="width:200%; max-width:200%; height:100%; object-fit:cover; object-position: left bottom; pointer-events:none;">`;
       }
       else if (pageData.type === 'spread-right') {
         page.style.overflow = 'hidden';
-        page.innerHTML = `<img src="${pageData.image}" loading="lazy" style="width:200%; max-width:200%; height:100%; object-fit:cover; object-position: right center; margin-left: -100%; pointer-events:none;">`;
+        page.innerHTML = `<img src="${pageData.image}" loading="lazy" style="width:200%; max-width:200%; height:100%; object-fit:cover; object-position: right bottom; margin-left: -100%; pointer-events:none;">`;
       }
       container.appendChild(page);
     });
