@@ -37,6 +37,7 @@ const DriveService = (() => {
             description: info?.description || '',
             coverImage: images.length > 0 ? images[0].url : '',
             images: images.map(img => img.url),
+            media: images,
           };
         })
       );
@@ -68,19 +69,23 @@ const DriveService = (() => {
    * Fetch images from a folder
    */
   async function fetchImages(folderId) {
-    const query = encodeURIComponent(`'${folderId}' in parents and mimeType contains 'image/' and trashed=false`);
-    const url = `${API_BASE}?q=${query}&key=${CONFIG.GOOGLE_DRIVE.apiKey}&fields=files(id,name,thumbnailLink)&orderBy=name&pageSize=20`;
+    const query = encodeURIComponent(`'${folderId}' in parents and (mimeType contains 'image/' or mimeType contains 'video/') and trashed=false`);
+    const url = `${API_BASE}?q=${query}&key=${CONFIG.GOOGLE_DRIVE.apiKey}&fields=files(id,name,mimeType,thumbnailLink)&orderBy=name&pageSize=20`;
 
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Drive API error: ${res.status}`);
     const data = await res.json();
 
-    return (data.files || []).map(file => ({
-      id: file.id,
-      name: file.name,
-      url: `https://drive.google.com/thumbnail?id=${file.id}&sz=w1920`,
-      thumb: `https://drive.google.com/thumbnail?id=${file.id}&sz=w400`,
-    }));
+    return (data.files || []).map(file => {
+      const isVideo = file.mimeType && file.mimeType.includes('video/');
+      return {
+        id: file.id,
+        name: file.name,
+        mimeType: file.mimeType,
+        url: isVideo ? `https://drive.google.com/uc?id=${file.id}` : `https://drive.google.com/thumbnail?id=${file.id}&sz=w1920`,
+        thumb: isVideo ? (file.thumbnailLink || `https://drive.google.com/thumbnail?id=${file.id}&sz=w400`) : `https://drive.google.com/thumbnail?id=${file.id}&sz=w400`,
+      };
+    });
   }
 
   /**

@@ -108,13 +108,20 @@ const Catalogue = (() => {
     pageCount++;
 
     // Preload image dimensions (skip Cover Image)
-    const promises = project.images.map((imgUrl, index) => {
+    const mediaList = project.media || project.images.map(url => ({url, mimeType: 'image/jpeg'}));
+    const promises = mediaList.map((item, index) => {
       if (index === 0) return Promise.resolve(null); 
+      
+      const isVideo = item.mimeType && item.mimeType.includes('video/');
+      if (isVideo) {
+        return Promise.resolve({ url: item.url, isLandscape: false, index, type: 'video' });
+      }
+
       return new Promise((resolve) => {
         const img = new Image();
-        img.onload = () => resolve({ url: imgUrl, isLandscape: img.naturalWidth > img.naturalHeight, index });
-        img.onerror = () => resolve({ url: imgUrl, isLandscape: false, index });
-        img.src = imgUrl;
+        img.onload = () => resolve({ url: item.url, isLandscape: img.naturalWidth > img.naturalHeight, index, type: 'image' });
+        img.onerror = () => resolve({ url: item.url, isLandscape: false, index, type: 'image' });
+        img.src = item.url;
       });
     });
 
@@ -123,9 +130,13 @@ const Catalogue = (() => {
     results.forEach((info) => {
       if (!info) return; // skip cover
       
-      const { url, isLandscape, index } = info;
+      const { url, isLandscape, index, type } = info;
       
-      if (isLandscape) { // If image is wide
+      if (type === 'video') {
+         layout.imageMap[index] = pageCount;
+         layout.pages.push({ type: 'video', image: url, imageIndex: index });
+         pageCount++;
+      } else if (isLandscape) { // If image is wide
         // Spread needs to start on an EVEN index page (Left side of the book when opened)
         if (pageCount % 2 !== 0) {
           layout.pages.push({ type: 'padder' });
@@ -200,15 +211,19 @@ const Catalogue = (() => {
         page.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;"><h3 style="color:var(--gold);font-family:var(--font-display);font-style:italic;opacity:0.3;">KAS HOUZING</h3></div>';
       }
       else if (pageData.type === 'portrait') {
-        page.innerHTML = `<img src="${pageData.image}" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:bottom;">`;
+        page.innerHTML = `<img src="${pageData.image}" loading="lazy" style="width:100%;height:100%;object-fit:contain;object-position:center bottom;">`;
       }
       else if (pageData.type === 'spread-left') {
         page.style.overflow = 'hidden';
-        page.innerHTML = `<img src="${pageData.image}" loading="lazy" style="width:200%; max-width:200%; height:100%; object-fit:cover; object-position: left bottom; pointer-events:none;">`;
+        page.innerHTML = `<img src="${pageData.image}" loading="lazy" style="width:200%; max-width:200%; height:100%; object-fit:contain; object-position: center bottom; pointer-events:none;">`;
       }
       else if (pageData.type === 'spread-right') {
         page.style.overflow = 'hidden';
-        page.innerHTML = `<img src="${pageData.image}" loading="lazy" style="width:200%; max-width:200%; height:100%; object-fit:cover; object-position: right bottom; margin-left: -100%; pointer-events:none;">`;
+        page.innerHTML = `<img src="${pageData.image}" loading="lazy" style="width:200%; max-width:200%; height:100%; object-fit:contain; object-position: center bottom; margin-left: -100%; pointer-events:none;">`;
+      }
+      else if (pageData.type === 'video') {
+        page.style.background = '#0a0a0a';
+        page.innerHTML = `<video class="catalogue-video" src="${pageData.image}" controls controlsList="nodownload" playsinline preload="metadata" style="width:100%;height:100%;object-fit:contain;object-position:center;"></video>`;
       }
       container.appendChild(page);
     });
@@ -266,6 +281,10 @@ const Catalogue = (() => {
       pageFlip.on('flip', (e) => {
         updatePageCounter(e.data);
         updateThumbnailActive(e.data);
+        // Auto-pause playing videos
+        document.querySelectorAll('.catalogue-video').forEach(vid => {
+          if (!vid.paused) vid.pause();
+        });
       });
     } catch (error) {
       console.error('PageFlip init error:', error);
@@ -315,13 +334,15 @@ const Catalogue = (() => {
     const container = document.getElementById('flipbook-thumbnails');
     if (!container) return;
 
-    container.innerHTML = project.images.map((imgUrl, index) => {
+    const mediaList = project.media || project.images.map(url => ({url, thumb: url}));
+
+    container.innerHTML = mediaList.map((item, index) => {
       const targetPage = layout ? layout.imageMap[index] : index;
       return `
       <div class="thumb-item ${index === 0 ? 'active' : ''}" 
            onclick="Catalogue.goToPage(${targetPage})"
            data-page="${targetPage}" data-index="${index}">
-        <img src="${imgUrl}" alt="Trang ${index + 1}" loading="lazy">
+        <img src="${item.thumb}" alt="Trang ${index + 1}" loading="lazy">
       </div>
     `}).join('');
   }
@@ -330,11 +351,16 @@ const Catalogue = (() => {
     const container = document.getElementById('gallery-grid');
     if (!container) return;
 
-    container.innerHTML = project.images.map((imgUrl, index) => `
-      <a href="${imgUrl}" class="gallery-item glightbox" data-gallery="project-gallery">
-        <img src="${imgUrl}" alt="${project.name} - Ảnh ${index + 1}" loading="lazy">
+    const mediaList = project.media || project.images.map(url => ({url, thumb: url, mimeType: 'image/jpeg'}));
+
+    container.innerHTML = mediaList.map((item, index) => {
+      const isVideo = item.mimeType && item.mimeType.includes('video/');
+      return `
+      <a href="${item.url}" class="gallery-item glightbox" data-gallery="project-gallery" style="position:relative; display:block;">
+        <img src="${item.thumb}" alt="${project.name} - ${isVideo ? 'Video' : 'Ảnh'} ${index + 1}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+        ${isVideo ? '<div class="play-icon-overlay" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--gold);"><svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>' : ''}
       </a>
-    `).join('');
+    `}).join('');
   }
 
   function toggleView() {
