@@ -5,6 +5,7 @@
 const Catalogue = (() => {
   let pageFlip = null;
   let currentProject = null;
+  let currentLayout = null;
   let isGalleryView = false;
   let lightboxInstance = null;
 
@@ -12,6 +13,16 @@ const Catalogue = (() => {
     // Modal controls
     document.getElementById('modal-close')?.addEventListener('click', close);
     document.getElementById('modal-overlay')?.addEventListener('click', close);
+    
+    // Allow closing when clicking the empty margins inside the container
+    document.querySelector('.modal-container')?.addEventListener('click', function(e) {
+      if (e.target === this || 
+          e.target.classList.contains('modal-body') || 
+          e.target.classList.contains('flipbook-wrapper') ||
+          e.target.classList.contains('flipbook-container')) {
+        close();
+      }
+    });
     document.getElementById('flip-prev')?.addEventListener('click', () => flipPrev());
     document.getElementById('flip-next')?.addEventListener('click', () => flipNext());
     document.getElementById('modal-gallery-btn')?.addEventListener('click', toggleView);
@@ -25,7 +36,7 @@ const Catalogue = (() => {
     });
   }
 
-  function open(project) {
+  async function open(project) {
     currentProject = project;
     isGalleryView = false;
 
@@ -40,14 +51,22 @@ const Catalogue = (() => {
     document.getElementById('flipbook-wrapper').style.display = '';
     document.getElementById('gallery-view').style.display = 'none';
 
-    // Build pages
-    buildFlipbook(project);
-    buildThumbnails(project);
-    buildGallery(project);
+    // Show modal loading state to feel fast
+    const fbContainer = document.getElementById('flipbook-container');
+    if (fbContainer) {
+      fbContainer.innerHTML = '<div style="display:flex;width:100%;height:100%;align-items:center;justify-content:center;color:var(--gold);"><div class="loading-spinner"></div></div>';
+    }
 
-    // Show modal
     modal.classList.add('active');
-    document.body.classList.add('no-scroll');
+    Animations.toggleScroll(true);
+
+    // Calculate layout asynchronously (detecting portrait vs landscape)
+    currentLayout = await calculateLayout(project);
+
+    // Build pages with spread awareness
+    buildFlipbook(project, currentLayout);
+    buildThumbnails(project, currentLayout);
+    buildGallery(project);
 
     // Initialize PageFlip after DOM paint
     requestAnimationFrame(() => {
@@ -60,68 +79,137 @@ const Catalogue = (() => {
   function close() {
     const modal = document.getElementById('project-modal');
     modal.classList.remove('active');
-    document.body.classList.remove('no-scroll');
+    Animations.toggleScroll(false);
 
-    // Destroy PageFlip
+    // Safely destroy PageFlip without breaking the main thread
     if (pageFlip) {
-      pageFlip.destroy();
+      try {
+        pageFlip.destroy();
+      } catch (e) {
+        console.warn('PageFlip cleanup:', e);
+      }
       pageFlip = null;
     }
     currentProject = null;
   }
 
-  function buildFlipbook(project) {
+  async function calculateLayout(project) {
+    const layout = { pages: [], imageMap: {} }; 
+    let pageCount = 0; // Current sequential page count in the book
+
+    // Page 0: Cover
+    layout.pages.push({ type: 'cover', image: project.coverImage, imageIndex: 0 });
+    layout.imageMap[0] = 0;
+    pageCount++;
+
+    // Page 1: Info Page
+    layout.pages.push({ type: 'info' });
+    layout.imageMap['info'] = 1;
+    pageCount++;
+
+    // Preload image dimensions (skip Cover Image)
+    const promises = project.images.map((imgUrl, index) => {
+      if (index === 0) return Promise.resolve(null); 
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve({ url: imgUrl, isLandscape: img.naturalWidth > img.naturalHeight, index });
+        img.onerror = () => resolve({ url: imgUrl, isLandscape: false, index });
+        img.src = imgUrl;
+      });
+    });
+
+    const results = await Promise.all(promises);
+    
+    results.forEach((info) => {
+      if (!info) return; // skip cover
+      
+      const { url, isLandscape, index } = info;
+      
+      if (isLandscape) { // If image is wide
+        // Spread needs to start on an EVEN index page (Left side of the book when opened)
+        if (pageCount % 2 !== 0) {
+          layout.pages.push({ type: 'padder' });
+          pageCount++;
+        }
+        
+        // Map thumbnail to the left half of the spread
+        layout.imageMap[index] = pageCount;
+        layout.pages.push({ type: 'spread-left', image: url, imageIndex: index });
+        pageCount++;
+        layout.pages.push({ type: 'spread-right', image: url, imageIndex: index });
+        pageCount++;
+      } else { // Portrait
+        layout.imageMap[index] = pageCount;
+        layout.pages.push({ type: 'portrait', image: url, imageIndex: index });
+        pageCount++;
+      }
+    });
+
+    // StPageFlip requires an even number of total pages to prevent engine crashing
+    if (pageCount % 2 !== 0) {
+      layout.pages.push({ type: 'padder-end' });
+      pageCount++;
+    }
+
+    return layout;
+  }
+
+  function buildFlipbook(project, layout) {
+    // Recreate the #flipbook element entirely to prevent lingering DOM corruption
+    const wrapper = document.getElementById('flipbook-container');
+    wrapper.innerHTML = '<div id="flipbook"></div>';
     const container = document.getElementById('flipbook');
-    container.innerHTML = '';
 
-    // Cover page: first image
-    const coverPage = document.createElement('div');
-    coverPage.className = 'page';
-    coverPage.innerHTML = `<img src="${project.coverImage}" alt="${project.name} - Cover" style="width:100%;height:100%;object-fit:cover;">`;
-    container.appendChild(coverPage);
-
-    // Info page
-    const infoPage = document.createElement('div');
-    infoPage.className = 'page page-info';
-    infoPage.innerHTML = `
-      <h2>${project.name}</h2>
-      <div class="page-info-item">
-        <span class="page-info-label">Địa chỉ</span>
-        <span class="page-info-value">${project.address}</span>
-      </div>
-      <div class="page-info-item">
-        <span class="page-info-label">Diện tích</span>
-        <span class="page-info-value">${project.area}</span>
-      </div>
-      <div class="page-info-item">
-        <span class="page-info-label">Phong cách</span>
-        <span class="page-info-value">${project.style}</span>
-      </div>
-      <div class="page-info-item">
-        <span class="page-info-label">Năm hoàn thành</span>
-        <span class="page-info-value">${project.year}</span>
-      </div>
-      ${project.description ? `<div class="page-info-desc">${project.description}</div>` : ''}
-    `;
-    container.appendChild(infoPage);
-
-    // Image pages (skip first since it's the cover)
-    project.images.forEach((imgUrl, index) => {
-      if (index === 0) return; // Skip cover image
+    layout.pages.forEach(pageData => {
       const page = document.createElement('div');
       page.className = 'page';
-      const img = document.createElement('img');
-      img.src = imgUrl;
-      img.alt = `${project.name} - Ảnh ${index + 1}`;
-      img.loading = 'lazy';
-      img.style.width = '100%';
-      img.style.height = '100%';
-      img.style.objectFit = 'cover';
-      img.onerror = function() {
-        this.parentElement.style.background = 'var(--bg-surface)';
-        this.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);font-size:0.9rem;">Không thể tải ảnh</div>';
-      };
-      page.appendChild(img);
+      
+      if (pageData.type === 'cover') {
+        page.innerHTML = `<img src="${pageData.image}" alt="Cover" style="width:100%;height:100%;object-fit:cover;">`;
+      } 
+      else if (pageData.type === 'info') {
+        page.className = 'page page-info';
+        page.innerHTML = `
+          <div class="info-content-wrapper">
+            <h2 class="info-title">${project.name}</h2>
+            <div class="info-divider"></div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-lbl">Địa chỉ</span>
+                <span class="info-vlu">${project.address}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-lbl">Diện tích</span>
+                <span class="info-vlu">${project.area}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-lbl">Phân loại</span>
+                <span class="info-vlu">${project.style}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-lbl">Năm HT</span>
+                <span class="info-vlu">${project.year}</span>
+              </div>
+            </div>
+            ${project.description ? `<div class="info-desc">${project.description}</div>` : ''}
+          </div>
+        `;
+      }
+      else if (pageData.type === 'padder' || pageData.type === 'padder-end') {
+        page.style.background = 'var(--bg-primary)';
+        page.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;"><h3 style="color:var(--gold);font-family:var(--font-display);font-style:italic;opacity:0.3;">KAS HOUZING</h3></div>';
+      }
+      else if (pageData.type === 'portrait') {
+        page.innerHTML = `<img src="${pageData.image}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">`;
+      }
+      else if (pageData.type === 'spread-left') {
+        page.style.overflow = 'hidden';
+        page.innerHTML = `<img src="${pageData.image}" loading="lazy" style="width:200%; max-width:200%; height:100%; object-fit:cover; object-position: left center; pointer-events:none;">`;
+      }
+      else if (pageData.type === 'spread-right') {
+        page.style.overflow = 'hidden';
+        page.innerHTML = `<img src="${pageData.image}" loading="lazy" style="width:200%; max-width:200%; height:100%; object-fit:cover; object-position: right center; margin-left: -100%; pointer-events:none;">`;
+      }
       container.appendChild(page);
     });
   }
@@ -223,17 +311,19 @@ const Catalogue = (() => {
     updatePageCounter(0);
   }
 
-  function buildThumbnails(project) {
+  function buildThumbnails(project, layout) {
     const container = document.getElementById('flipbook-thumbnails');
     if (!container) return;
 
-    container.innerHTML = project.images.map((imgUrl, index) => `
+    container.innerHTML = project.images.map((imgUrl, index) => {
+      const targetPage = layout ? layout.imageMap[index] : index;
+      return `
       <div class="thumb-item ${index === 0 ? 'active' : ''}" 
-           onclick="Catalogue.goToPage(${index + 1})"
-           data-page="${index + 1}">
+           onclick="Catalogue.goToPage(${targetPage})"
+           data-page="${targetPage}" data-index="${index}">
         <img src="${imgUrl}" alt="Trang ${index + 1}" loading="lazy">
       </div>
-    `).join('');
+    `}).join('');
   }
 
   function buildGallery(project) {
@@ -289,17 +379,41 @@ const Catalogue = (() => {
 
   function updatePageCounter(pageIndex) {
     const el = document.getElementById('flip-pages');
-    if (!el || !currentProject) return;
-    const total = currentProject.images.length + 1; // +1 for info page
-    const current = (pageIndex || 0) + 1;
+    if (!el || !currentLayout) return;
+    
+    // Total physical pages in the flipbook
+    let total = currentLayout.pages.length;
+    
+    // Subtract padding pages from total count if any exist at the end
+    if (currentLayout.pages[currentLayout.pages.length-1]?.type === 'padder-end') total--;
+
+    const current = Math.min((pageIndex || 0) + 1, total);
     el.textContent = `Trang ${current} / ${total}`;
   }
 
   function updateThumbnailActive(pageIndex) {
+    if (!currentLayout) return;
+    
     const thumbs = document.querySelectorAll('.thumb-item');
-    thumbs.forEach((thumb, i) => {
-      thumb.classList.toggle('active', i === (pageIndex || 0) - 1);
+    thumbs.forEach(t => t.classList.remove('active'));
+
+    // Because a spread image can occupy 2 pages (N and N+1) and padders offset sequencing,
+    // we find the newest thumbnail whose start page is <= current pageIndex.
+    let activeThumb = null;
+    let highestPage = -1;
+    
+    thumbs.forEach((thumb) => {
+      const p = parseInt(thumb.dataset.page);
+      if (p <= pageIndex && p > highestPage) {
+        highestPage = p;
+        activeThumb = thumb;
+      }
     });
+
+    if (activeThumb) {
+      activeThumb.classList.add('active');
+      activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
   }
 
   return {

@@ -1,25 +1,59 @@
 /**
  * KAS Catalogue — Animations Module
- * GSAP-powered scroll animations and effects
+ * High-End Redesign: Lenis Smooth Scroll + GSAP
  */
 const Animations = (() => {
+  let lenisInstance = null;
+
   function init() {
+    initLenis();
+
     if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
-      console.warn('GSAP not loaded. Falling back to CSS animations.');
-      initFallback();
+      console.warn('GSAP not loaded.');
       return;
     }
 
     gsap.registerPlugin(ScrollTrigger);
 
+    // Sync Lenis with GSAP ScrollTrigger
+    if (lenisInstance) {
+      lenisInstance.on('scroll', ScrollTrigger.update);
+      gsap.ticker.add((time) => {
+        lenisInstance.raf(time * 1000);
+      });
+      gsap.ticker.lagSmoothing(0, 0);
+    }
+
     initScrollAnimations();
     initParallax();
-    initCounters();
     createParticles();
   }
 
   /**
-   * Scroll-triggered reveal animations
+   * Khởi tạo Lenis Soft Scroll
+   */
+  function initLenis() {
+    if (typeof Lenis !== 'undefined') {
+      lenisInstance = new Lenis({
+        duration: 1.5,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // easeOutExpo
+        direction: 'vertical',
+        gestureDirection: 'vertical',
+        smooth: true,
+        smoothTouch: false,
+        touchMultiplier: 2,
+      });
+
+      function raf(time) {
+        lenisInstance.raf(time);
+        requestAnimationFrame(raf);
+      }
+      requestAnimationFrame(raf);
+    }
+  }
+
+  /**
+   * GSAP Scroll-triggered reveal animations (Slow & Elegant)
    */
   function initScrollAnimations() {
     const elements = document.querySelectorAll('[data-animate]');
@@ -29,90 +63,147 @@ const Animations = (() => {
       const delay = parseFloat(el.getAttribute('data-delay') || '0');
       const isHeroElement = el.closest('#hero') !== null;
 
-      const fromVars = { opacity: 0, duration: 0.8 };
+      // Make duration much longer for luxury feel
+      const fromVars = { opacity: 0, duration: 1.5, ease: 'power4.out' };
 
       switch (type) {
         case 'fade-up':
-          fromVars.y = 40;
+          fromVars.y = 60;
           break;
         case 'fade-down':
-          fromVars.y = -40;
+          fromVars.y = -60;
           break;
         case 'fade-right':
-          fromVars.x = -40;
+          fromVars.x = -60;
           break;
         case 'fade-left':
-          fromVars.x = 40;
+          fromVars.x = 60;
           break;
       }
 
       if (isHeroElement) {
-        // Hero elements: animate immediately with stagger (preloader already gone)
         fromVars.delay = delay;
-        gsap.from(el, {
-          ...fromVars,
-          ease: 'power3.out',
-          onComplete: () => el.classList.add('animated'),
-        });
+        gsap.from(el, fromVars);
       } else {
-        // Other elements: animate on scroll
         fromVars.delay = delay;
         gsap.from(el, {
           ...fromVars,
-          ease: 'power3.out',
           scrollTrigger: {
             trigger: el,
-            start: 'top 90%',
+            start: 'top 85%',
             once: true,
-            onEnter: () => el.classList.add('animated'),
           },
         });
       }
     });
+
+    // Special line animations
+    document.querySelectorAll('.section-line').forEach(line => {
+      gsap.from(line, {
+        width: 0,
+        duration: 1.5,
+        ease: 'power4.out',
+        scrollTrigger: {
+          trigger: line,
+          start: 'top 90%',
+          once: true,
+        }
+      });
+    });
   }
 
   /**
-   * Parallax effect on hero background
+   * Parallax effect on hero background (Slower)
    */
   function initParallax() {
     const heroBg = document.querySelector('.hero-bg-img');
     if (!heroBg) return;
 
     gsap.to(heroBg, {
-      y: '20%',
+      y: '30%',
       ease: 'none',
       scrollTrigger: {
         trigger: '.hero',
         start: 'top top',
         end: 'bottom top',
-        scrub: 1,
+        scrub: 1.5, // Smoother scrub
       },
     });
 
-    // Mark hero as in-view for the scale animation
-    const hero = document.getElementById('hero');
-    if (hero) {
-      setTimeout(() => hero.classList.add('in-view'), 100);
-    }
+    // Scale down hero bg slightly on load to create a cinematic intro
+    gsap.from(heroBg, {
+      scale: 1.15,
+      duration: 3,
+      ease: 'power3.out'
+    });
   }
 
   /**
-   * Counter animation for stats
+   * Floating particles in hero (Slower, finer)
    */
-  function initCounters() {
-    const counters = document.querySelectorAll('.stat-number[data-count]');
+  function createParticles() {
+    const container = document.getElementById('hero-particles');
+    if (!container) return;
 
-    counters.forEach(counter => {
-      const target = parseInt(counter.getAttribute('data-count'));
+    const particleCount = window.innerWidth > 768 ? 20 : 10;
 
-      gsap.to(counter, {
-        innerText: target,
-        duration: 2,
-        ease: 'power2.out',
-        snap: { innerText: 1 },
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.animationDelay = Math.random() * 8 + 's';
+      particle.style.animationDuration = (10 + Math.random() * 10) + 's'; // Slower
+      particle.style.width = (1 + Math.random() * 2) + 'px'; // Smaller
+      particle.style.height = particle.style.width;
+      particle.style.opacity = 0;
+      particle.style.background = 'var(--gold)';
+      particle.style.position = 'absolute';
+      particle.style.bottom = '-10px';
+      particle.style.borderRadius = '50%';
+      // Add keyframes dynamically or rely on CSS. 
+      // We will rely on CSS animation 'floatUp' which we need to define in main.css if not there, or animate with GSAP.
+      
+      // Let's just animate with GSAP for better control
+      container.appendChild(particle);
+      
+      animateParticle(particle);
+    }
+  }
+
+  function animateParticle(p) {
+    if (typeof gsap === 'undefined') return;
+    
+    gsap.to(p, {
+      y: -(window.innerHeight * (0.5 + Math.random())),
+      x: (Math.random() - 0.5) * 50,
+      opacity: Math.random() * 0.5,
+      duration: 10 + Math.random() * 10,
+      ease: 'none',
+      delay: Math.random() * 5,
+      onComplete: () => {
+        gsap.set(p, { y: 0, x: 0, opacity: 0 });
+        animateParticle(p);
+      }
+    });
+  }
+
+  /**
+   * Animate portfolio cards dynamically
+   */
+  function animatePortfolioCards() {
+    const cards = document.querySelectorAll('.portfolio-card');
+    if (cards.length === 0 || typeof gsap === 'undefined') return;
+
+    cards.forEach((card, i) => {
+      gsap.from(card, {
+        opacity: 0,
+        y: 80,
+        duration: 1.5,
+        delay: i * 0.1,
+        ease: 'power4.out',
         scrollTrigger: {
-          trigger: counter,
-          start: 'top 80%',
+          trigger: card,
+          start: 'top 85%',
           once: true,
         },
       });
@@ -120,111 +211,23 @@ const Animations = (() => {
   }
 
   /**
-   * Floating gold particles in hero
+   * Pause/Resume Lenis when Opening Modal
    */
-  function createParticles() {
-    const container = document.getElementById('hero-particles');
-    if (!container) return;
-
-    const particleCount = window.innerWidth > 768 ? 30 : 15;
-
-    for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement('div');
-      particle.className = 'particle';
-      particle.style.left = Math.random() * 100 + '%';
-      particle.style.animationDelay = Math.random() * 8 + 's';
-      particle.style.animationDuration = (6 + Math.random() * 6) + 's';
-      particle.style.width = (1 + Math.random() * 3) + 'px';
-      particle.style.height = particle.style.width;
-      particle.style.opacity = 0;
-      container.appendChild(particle);
-    }
-  }
-
-  /**
-   * Animate portfolio cards on load
-   */
-  function animatePortfolioCards() {
-    const cards = document.querySelectorAll('.portfolio-card');
-    if (typeof gsap === 'undefined') {
-      cards.forEach(c => { c.style.opacity = 1; });
-      return;
-    }
-
-    gsap.from(cards, {
-      opacity: 0,
-      y: 30,
-      duration: 0.6,
-      stagger: 0.1,
-      ease: 'power3.out',
-      scrollTrigger: {
-        trigger: '#portfolio-grid',
-        start: 'top 85%',
-        once: true,
-      },
-    });
-  }
-
-  /**
-   * Fallback for when GSAP is not available
-   */
-  function initFallback() {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const delay = parseFloat(entry.target.getAttribute('data-delay') || '0') * 1000;
-            setTimeout(() => {
-              entry.target.classList.add('animated');
-            }, delay);
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.15 }
-    );
-
-    document.querySelectorAll('[data-animate]').forEach(el => observer.observe(el));
-
-    // Hero in-view
-    const hero = document.getElementById('hero');
-    if (hero) setTimeout(() => hero.classList.add('in-view'), 100);
-
-    // Simple counter
-    const counterObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const el = entry.target;
-            const target = parseInt(el.getAttribute('data-count'));
-            animateCounter(el, target);
-            counterObserver.unobserve(el);
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-
-    document.querySelectorAll('.stat-number[data-count]').forEach(el => counterObserver.observe(el));
-    createParticles();
-  }
-
-  function animateCounter(el, target) {
-    let current = 0;
-    const step = target / 60;
-    const interval = setInterval(() => {
-      current += step;
-      if (current >= target) {
-        el.textContent = target;
-        clearInterval(interval);
+  function toggleScroll(isLocked) {
+    if (lenisInstance) {
+      if (isLocked) {
+        lenisInstance.stop();
       } else {
-        el.textContent = Math.floor(current);
+        lenisInstance.start();
       }
-    }, 30);
+    } else {
+      document.body.classList.toggle('no-scroll', isLocked);
+    }
   }
 
   return {
     init,
     animatePortfolioCards,
+    toggleScroll
   };
 })();

@@ -16,7 +16,7 @@ const CONFIG = {
   BRAND: {
     name: 'Kas Houzing',                          // Tên thương hiệu chính
     tagline: 'Architecture & Interior Design',     // Dòng mô tả bên cạnh tên
-    slogan: 'MỘT ĐIỂM CHẠM, VẠN TINH HOA !',     // Slogan hiển thị ở Hero
+    slogan: 'MỘT ĐIỂM CHẠM, VẠN TINH HOA!',     // Slogan hiển thị ở Hero (đã bỏ dấu cách thừa)
     description: 'Thiết kế & Thi công Nội thất Cao cấp — Chìa khóa trao tay',
     
     // Logo: để trống '' nếu chưa có, điền link ảnh logo khi có

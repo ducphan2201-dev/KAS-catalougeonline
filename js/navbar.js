@@ -34,8 +34,8 @@ const Navbar = (() => {
 
     toggle.addEventListener('click', () => {
       toggle.classList.toggle('active');
-      links.classList.toggle('open');
-      document.body.classList.toggle('no-scroll');
+      const isOpen = links.classList.toggle('open');
+      Animations.toggleScroll(isOpen);
     });
 
     // Close menu on link click
@@ -43,7 +43,7 @@ const Navbar = (() => {
       link.addEventListener('click', () => {
         toggle.classList.remove('active');
         links.classList.remove('open');
-        document.body.classList.remove('no-scroll');
+        Animations.toggleScroll(false);
       });
     });
   }
