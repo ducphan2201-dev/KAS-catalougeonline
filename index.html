@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kas Houzing | Architecture & Interior Design</title>
+  <meta name="description" content="Kas Houzing - Thiết kế & thi công nội thất cao cấp. Một điểm chạm, vạn tinh hoa!">
+  <meta name="keywords" content="nội thất cao cấp, thiết kế nội thất, thi công nội thất, Kas Houzing, interior design">
+  <meta property="og:title" content="Kas Houzing | Architecture & Interior Design">
+  <meta property="og:description" content="Thiết kế & thi công nội thất cao cấp — Một điểm chạm, vạn tinh hoa!">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+
+  <!-- Libraries (CDN) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
+
+  <!-- Main Styles -->
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+  <!-- ===== PRELOADER ===== -->
+  <div id="preloader" class="preloader">
+    <div class="loader-content">
+      <div class="loader-logo">
+        <span class="loader-k">K</span>
+        <span class="loader-a">A</span>
+        <span class="loader-s">S</span>
+      </div>
+      <div class="loader-tagline" id="loader-tagline">Architecture & Interior Design</div>
+      <div class="loader-bar">
+        <div class="loader-progress"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== NAVIGATION ===== -->
+  <nav id="navbar" class="navbar">
+    <div class="nav-container">
+      <a href="#hero" class="nav-logo" id="nav-logo">
+        <!-- Logo image: nếu CONFIG.BRAND.logoUrl có giá trị, JS sẽ thêm <img> ở đây -->
+        <span class="logo-text" id="nav-brand-name">Kas Houzing</span>
+        <span class="logo-divider"></span>
+        <span class="logo-tagline" id="nav-brand-tagline">Architecture & Interior Design</span>
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="#hero" class="nav-link active" data-section="hero">Trang chủ</a>
+        <a href="#portfolio" class="nav-link" data-section="portfolio">Dự án</a>
+        <a href="#contact" class="nav-link" data-section="contact">Liên hệ</a>
+      </div>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== HERO SECTION ===== -->
+  <section id="hero" class="hero">
+    <div class="hero-bg">
+      <img src="images/hero-bg.png" alt="" class="hero-bg-img" id="hero-bg-img">
+      <div class="hero-overlay"></div>
+    </div>
+    <div class="hero-particles" id="hero-particles"></div>
+    <div class="hero-content">
+      <div class="hero-badge" data-animate="fade-down">
+        <span class="badge-line"></span>
+        <span id="hero-tagline">Architecture & Interior Design</span>
+        <span class="badge-line"></span>
+      </div>
+      <h1 class="hero-title" data-animate="fade-up">
+        <span class="title-line">
+          <!-- Logo hoặc tên brand -->
+          <span class="title-word" id="hero-brand-name">Kas Houzing</span>
+        </span>
+      </h1>
+      <p class="hero-slogan" data-animate="fade-up" data-delay="0.2">
+        <span class="slogan-quote">"</span><span id="hero-slogan-text">MỘT ĐIỂM CHẠM, VẠN TINH HOA !</span><span class="slogan-quote">"</span>
+      </p>
+      <p class="hero-desc" data-animate="fade-up" data-delay="0.4" id="hero-desc">
+        Thiết kế & Thi công Nội thất Cao cấp — Chìa khóa trao tay
+      </p>
+      <div class="hero-cta" data-animate="fade-up" data-delay="0.6">
+        <a href="#portfolio" class="btn btn-gold">
+          <span>Khám phá dự án</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#contact" class="btn btn-outline-gold">
+          <span>Liên hệ tư vấn</span>
+        </a>
+      </div>
+    </div>
+    <div class="scroll-indicator" data-animate="fade-up" data-delay="1">
+      <span>Khám phá</span>
+      <div class="scroll-line">
+        <div class="scroll-dot"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PORTFOLIO SECTION ===== -->
+  <section id="portfolio" class="section portfolio-section">
+    <div class="container">
+      <div class="section-header" data-animate="fade-up">
+        <span class="section-tag">Portfolio</span>
+        <h2 class="section-title" id="portfolio-title">Dự Án <span class="gold">Nổi Bật</span></h2>
+        <div class="section-line"></div>
+        <p class="section-desc" id="portfolio-desc">Những công trình thể hiện đẳng cấp và phong cách thiết kế độc đáo của Kas Houzing</p>
+      </div>
+
+      <!-- Portfolio Filters — được tạo động từ CONFIG -->
+      <div class="portfolio-filters" id="portfolio-filters" data-animate="fade-up" data-delay="0.2">
+        <!-- JS sẽ render filter buttons từ CONFIG.PORTFOLIO.categories -->
+      </div>
+
+      <!-- Portfolio Grid -->
+      <div class="portfolio-grid" id="portfolio-grid">
+        <!-- Items loaded dynamically by JS -->
+      </div>
+
+      <!-- Loading State -->
+      <div class="portfolio-loading" id="portfolio-loading">
+        <div class="loading-spinner"></div>
+        <p>Đang tải dự án...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT SECTION ===== -->
+  <section id="contact" class="section contact-section">
+    <div class="container">
+      <div class="section-header" data-animate="fade-up">
+        <span class="section-tag">Liên hệ</span>
+        <h2 class="section-title">Bắt Đầu Dự Án <span class="gold">Của Bạn</span></h2>
+        <div class="section-line"></div>
+        <p class="section-desc">Hãy để Kas Houzing biến ý tưởng của bạn thành hiện thực</p>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-info" data-animate="fade-right">
+          <!-- Email -->
+          <div class="contact-item" id="contact-email-item">
+            <div class="contact-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </div>
+            <div>
+              <h4>Email</h4>
+              <p><a href="mailto:Noithatkas@gmail.com" id="contact-email-link">Noithatkas@gmail.com</a></p>
+            </div>
+          </div>
+          <!-- Phone (ẩn nếu chưa có) -->
+          <div class="contact-item" id="contact-phone-item" style="display:none;">
+            <div class="contact-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+            </div>
+            <div>
+              <h4>Hotline</h4>
+              <p><a href="tel:" id="contact-phone-link"></a></p>
+            </div>
+          </div>
+          <!-- Address -->
+          <div class="contact-item" id="contact-address-item">
+            <div class="contact-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+            </div>
+            <div>
+              <h4>Địa chỉ</h4>
+              <p id="contact-address-text">01 Louis 1, Louis City Đại Mỗ, Hà Nội</p>
+            </div>
+          </div>
+          <!-- Social Media -->
+          <div class="contact-socials" id="contact-socials">
+            <!-- JS sẽ render các social link từ CONFIG.SOCIAL -->
+          </div>
+        </div>
+        <form class="contact-form" id="contact-form" data-animate="fade-left">
+          <div class="form-group">
+            <input type="text" name="name" id="form-name" placeholder=" " required>
+            <label for="form-name">Họ và tên *</label>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <input type="email" name="email" id="form-email" placeholder=" " required>
+              <label for="form-email">Email *</label>
+            </div>
+            <div class="form-group">
+              <input type="tel" name="phone" id="form-phone" placeholder=" ">
+              <label for="form-phone">Số điện thoại</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <select name="service" id="form-service" required>
+              <option value="" disabled selected>Dịch vụ quan tâm *</option>
+              <option value="design">Thiết kế nội thất</option>
+              <option value="construction">Thi công trọn gói</option>
+              <option value="consultation">Tư vấn phong cách</option>
+              <option value="renovation">Cải tạo không gian</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <textarea name="message" id="form-message" rows="4" placeholder=" "></textarea>
+            <label for="form-message">Mô tả dự án của bạn</label>
+          </div>
+          <button type="submit" class="btn btn-gold btn-full" id="form-submit">
+            <span>Gửi yêu cầu tư vấn</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </button>
+          <div class="form-success" id="form-success">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            <h3>Cảm ơn bạn!</h3>
+            <p>Chúng tôi sẽ liên hệ lại trong thời gian sớm nhất.</p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid footer-grid-compact">
+        <div class="footer-brand">
+          <div class="footer-logo" id="footer-brand-name">Kas Houzing</div>
+          <p class="footer-slogan" id="footer-slogan">"MỘT ĐIỂM CHẠM, VẠN TINH HOA !"</p>
+          <p class="footer-desc" id="footer-tagline">Architecture & Interior Design</p>
+        </div>
+        <div class="footer-nav">
+          <h4>Điều hướng</h4>
+          <a href="#hero">Trang chủ</a>
+          <a href="#portfolio">Dự án</a>
+          <a href="#contact">Liên hệ</a>
+        </div>
+        <div class="footer-contact">
+          <h4>Liên hệ</h4>
+          <p id="footer-email">Noithatkas@gmail.com</p>
+          <p id="footer-phone"></p>
+          <p id="footer-address">01 Louis 1, Louis City Đại Mỗ, Hà Nội</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; <span id="footer-year">2026</span> <span id="footer-copyright-name">Kas Houzing</span>. All rights reserved.</p>
+        <p class="footer-credit">Crafted with passion for luxury living</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== PROJECT MODAL (PAGE FLIP) ===== -->
+  <div id="project-modal" class="project-modal">
+    <div class="modal-overlay" id="modal-overlay"></div>
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <h3 class="modal-title" id="modal-title"></h3>
+          <p class="modal-subtitle" id="modal-subtitle"></p>
+        </div>
+        <div class="modal-controls">
+          <button class="modal-btn" id="modal-gallery-btn" title="Xem gallery">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </button>
+          <button class="modal-btn" id="modal-close" title="Đóng">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <!-- Page Flip View -->
+        <div class="flipbook-wrapper" id="flipbook-wrapper">
+          <button class="flip-arrow flip-prev" id="flip-prev">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="flipbook-container" id="flipbook-container">
+            <div id="flipbook"></div>
+          </div>
+          <button class="flip-arrow flip-next" id="flip-next">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+        <div class="flipbook-footer">
+          <div class="flip-pages" id="flip-pages">Trang 1 / 10</div>
+          <div class="flipbook-thumbnails" id="flipbook-thumbnails"></div>
+        </div>
+
+        <!-- Gallery View -->
+        <div class="gallery-view" id="gallery-view" style="display:none;">
+          <div class="gallery-grid" id="gallery-grid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCRIPTS ===== -->
+  <!-- GSAP -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+  <!-- Page Flip -->
+  <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
+  <!-- GLightbox -->
+  <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+
+  <!-- App Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/demoData.js"></script>
+  <script src="js/driveService.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/portfolio.js"></script>
+  <script src="js/catalogue.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/contact.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
