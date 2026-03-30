@@ -22,7 +22,7 @@ const DEMO_PROJECTS = [
   },
   {
     id: 'demo-2',
-    name: 'Penthouse Landmark 81',
+    name: 'LỖI API GOOGLE RỒI!',
     category: 'penthouse',
     address: 'Bình Thạnh, TP.HCM',
     area: '350m²',
